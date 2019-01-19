@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Login</title>
+    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+</head>
+<body style="margin:10% auto">
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6">
+          <img src="/dist/img/ows.png"  class="img-responsive">
+      </div>
+      <div class="col-sm-6">
+        <h1>OWS Vietnam</h1>
+        <form id="form-login">
+            <div class="form-group has-error">
+                <label id="error" class="control-label"></label>
+            </div>
+          <div class="form-group has-feedback">
+            <input id="user" type="text" placeholder="Username" class="form-control" spellcheck="false" autocapitalize="off">
+            <span class="glyphicon glyphicon-user form-control-feedback"></span>    
+        </div>
+          <div class="form-group has-feedback">
+            <input id="pass" type="password" placeholder="Password" class="form-control" spellcheck="false" autocapitalize="off">
+            <span class="glyphicon glyphicon-lock form-control-feedback"></span>    
+        </div>
+          <div class="form-group">
+            <button class="btn btn-primary" id="btn-submit" type="submit">Sign In</button>
+          </div>
+          <div class="form-group">
+              <span>Don't have an account?</span><a href="/signup"> Sign up now</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+    <script>
+        $(document).ready(()=>{
+            $('#form-login').submit(()=>{
+                $('#error').html('');
+                $('#user').css('border-color','#ccc');
+                $('#pass').css('border-color','#ccc');
+                if($('#user').val() == '' || $('#pass').val()==''){
+                    $('#error').html('Missing Username or Password!');
+                    return false;
+                }
+                $('#btn-submit').attr('disabled',true);
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        "Content-Type":"application/json"
+                    },
+                    url: 'http://125.212.227.42:18080/api/ext/login',
+                    data: JSON.stringify({
+                        username:$('#user').val(),
+                        password:$('#pass').val()
+                    }),
+                    success: function(obj){
+                        $('#btn-submit').attr('disabled',false);
+                        if(obj.Authorization === true){
+                            document.cookie = "username="+$('#user').val()+";expires="+new Date(new Date().getTime()+12*3600*1000).toUTCString()+";path=/;";
+                            document.cookie = "token="+obj.token+";expires="+new Date(new Date().getTime()+12*3600*1000).toUTCString()+";path=/;";
+                            location.href="/";
+                        }
+                            else
+                                err();
+                    },
+                    error: err
+                });
+            return false;
+            });
+        });
+    function err(){
+        $('#user').css('border-color','rgba(255, 0, 0, 0.5');
+        $('#pass').css('border-color','rgba(255, 0, 0, 0.5');
+        $('#error').html("Incorrect Username or Password!");
+        $('#btn-submit').attr('disabled',false)
+    }
+    </script>
+</body>
+</html>

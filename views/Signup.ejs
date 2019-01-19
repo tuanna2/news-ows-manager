@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+</head>
+<body style="margin:10% auto">
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6">
+          <img src="/dist/img/ows.png"  class="img-responsive">
+      </div>
+      <div class="col-sm-6">
+        <h1>Sign Up</h1>
+        <form id="form-signup">
+            <div class="form-group has-error">
+                <label id="error" class="control-label"></label>
+            </div>
+          <div class="form-group has-feedback">
+            <input id="user" type="text" placeholder="Username" class="form-control" spellcheck="false" autocapitalize="off">
+            <span class="glyphicon glyphicon-user form-control-feedback"></span>  
+        </div>
+          <div class="form-group has-feedback">
+                <input id="email" type="email" class="form-control" placeholder="Email">
+                <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+            </div>
+          <div class="form-group has-feedback">
+            <input id="pass" type="password" placeholder="Password" class="form-control" spellcheck="false" autocapitalize="off">
+            <span class="glyphicon glyphicon-lock form-control-feedback"></span>  
+        </div>
+          <div class="form-group has-feedback">
+                <input id="retype-pass" type="password" placeholder="Retype password" class="form-control" spellcheck="false" autocapitalize="off">
+                <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
+            </div>
+          <div class="form-group has-feedback">
+            <button id="btn-submit" class="btn btn-primary" type="submit">Sign Up</button>
+          </div>
+          <div class="form-group">
+              <span>Already have an account?</span><a href="/login"> Login</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+    <script>
+        $(document).ready(()=>{
+            $('#form-signup').submit(()=>{
+                $('#error').html('');
+                $('#user').css('border-color','#ccc');
+                $('#retype-pass').css('border-color','#ccc');
+                $('#pass').css('border-color','#ccc');
+                if($('#user').val() == '' || $('#pass').val()=='' || $('#retype-pass').val()==''  || $('#email').val()==''){
+                    $('#error').html('Please complete all information!');
+                    return false;
+                }
+                if($('#pass').val() !== $('#retype-pass').val()){
+                    $('#pass').css('border-color','rgba(255, 0, 0, 0.5');
+                    $('#retype-pass').css('border-color','rgba(255, 0, 0, 0.5');
+                    $('#error').html('Password and Retype password is different!');
+                    return false;
+                }
+                $('#btn-submit').attr('disabled',true);
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        "Content-Type":"application/json"
+                    },
+                    url: 'http://125.212.227.42:18080/api/ext/register',
+                    data: JSON.stringify({
+                        username:$('#user').val(),
+                        password:$('#pass').val(),
+                        email:$('#email').val()
+                    }),
+                    success: function(obj){
+                        $('#btn-submit').attr('disabled',false);
+                        $('#error').css('color','rgb(66, 169, 114)');
+                        $('#error').html("Successful sign up.Please login!");
+                        setTimeout(()=>{
+                            location.href="/login";
+                        },2000);
+                    },
+                    error: function(err){
+                        $('#user').css('border-color','rgba(255, 0, 0, 0.5');
+                        $('#error').html("Username is already!");
+                        $('#btn-submit').attr('disabled',false)
+                    }
+                });
+            return false;
+            });
+        });
+    </script>
+</body>
+</html>
